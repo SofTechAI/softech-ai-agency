@@ -77,21 +77,51 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "SofTech AI Agency — AI Solutions & Intelligent Automations" },
+      {
+        name: "description",
+        content:
+          "SofTech AI Agency builds enterprise-grade AI systems, chatbots, voice agents and automations that grow revenue, cut cost and scale operations 24/7.",
+      },
+      { name: "author", content: "SofTech AI Agency" },
+      { name: "theme-color", content: "#0F172A" },
+      { property: "og:title", content: "SofTech AI Agency — AI Solutions & Intelligent Automations" },
+      {
+        property: "og:description",
+        content:
+          "We build AI systems that work while you sleep. Automation, AI agents and custom AI for SMBs, startups and enterprises.",
+      },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "SofTech AI Agency" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "SofTech AI Agency" },
+      {
+        name: "twitter:description",
+        content: "AI Solutions. Intelligent Automations. Real Business Growth.",
+      },
     ],
     links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "SofTech AI Agency",
+          description:
+            "AI & automation agency building intelligent systems, chatbots, voice agents and custom AI for modern businesses.",
+          slogan: "AI Solutions. Intelligent Automations. Real Business Growth.",
+        }),
+      },
     ],
   }),
   shellComponent: RootShell,
