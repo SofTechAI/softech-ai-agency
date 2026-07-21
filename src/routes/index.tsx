@@ -299,14 +299,12 @@ function useI18n() {
 
 function Logo() {
   return (
-    <a href="#top" className="flex items-center gap-2.5 group">
-      <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#14b8a6] to-[#8b5cf6] shadow-glow">
-        <Sparkles className="h-5 w-5 text-white" />
-        <span className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#67e8f9]/0 to-[#8b5cf6]/50 opacity-0 group-hover:opacity-100 blur transition" />
-      </span>
-      <span className="font-display text-lg font-semibold tracking-tight">
-        SofTech<span className="text-gradient-primary"> AI</span>
-      </span>
+    <a href="#top" className="flex items-center gap-2.5 group leading-none">
+      <img
+        src="/logo.png"
+        alt="SofTech AI"
+        className="block h-15 w-auto -translate-y-1.5"
+      />
     </a>
   );
 }
