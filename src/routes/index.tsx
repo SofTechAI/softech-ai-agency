@@ -1664,15 +1664,15 @@ function Contact() {
 
                 <ul className="mt-8 space-y-4 text-sm">
                   {[
-                    { icon: Mail, k: lang === "es" ? "Email" : "Email", v: "hello@softech.ai" },
-                    { icon: PhoneCall, k: lang === "es" ? "Llamada" : "Call", v: "+1 (415) 555-0117" },
+                    { icon: Mail, k: lang === "es" ? "Email" : "Email", v: "rrondonc@gmail.com" },
+                    { icon: PhoneCall, k: lang === "es" ? "Llamada" : "Call", v: "+57 (318) 928-2999" },
                     {
                       icon: MapPin,
                       k: lang === "es" ? "Estudio" : "Studio",
                       v:
                         lang === "es"
-                          ? "Remoto primero · San Francisco · Lisboa"
-                          : "Remote-first · San Francisco · Lisbon",
+                          ? "Remoto primero · Barranquilla · Caracas"
+                          : "Remote-first · Barranquilla · Caracas",
                     },
                   ].map((c) => (
                     <li key={c.k} className="flex items-center gap-3">
