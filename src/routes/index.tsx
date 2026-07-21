@@ -1,5 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   ArrowRight,
   Bot,
@@ -99,14 +106,196 @@ function AuroraBackdrop() {
 
 /* --------------------------------- NAV ---------------------------------- */
 
-const NAV_LINKS = [
-  { href: "#services", label: "Services" },
-  { href: "#solutions", label: "Solutions" },
-  { href: "#process", label: "Process" },
-  { href: "#industries", label: "Industries" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#faq", label: "FAQ" },
-];
+const NAV_LINKS = {
+  en: [
+    { href: "#services", label: "Services" },
+    { href: "#solutions", label: "Solutions" },
+    { href: "#process", label: "Process" },
+    { href: "#industries", label: "Industries" },
+    { href: "#pricing", label: "Pricing" },
+    { href: "#faq", label: "FAQ" },
+  ],
+  es: [
+    { href: "#services", label: "Servicios" },
+    { href: "#solutions", label: "Soluciones" },
+    { href: "#process", label: "Proceso" },
+    { href: "#industries", label: "Industrias" },
+    { href: "#pricing", label: "Precios" },
+    { href: "#faq", label: "FAQ" },
+  ],
+} as const;
+
+type Language = "en" | "es";
+
+const COPY = {
+  en: {
+    contact: "Contact",
+    bookCall: "Book a call",
+    openMenu: "Open menu",
+    trustBadge: "Trusted AI partner for modern teams",
+    heroTitleA: "Build an",
+    heroTitleB: "AI-powered",
+    heroTitleC: "business.",
+    heroTitleD: "Automate work.",
+    heroTitleE: "Scale faster.",
+    heroDescription:
+      "SofTech AI Agency designs, builds and deploys custom AI systems, agents and automations that work 24/7 so your team can focus on growth, not busywork.",
+    heroPrimaryCta: "Book a free consultation",
+    heroSecondaryCta: "See our solutions",
+    statLeadGen: "Lead generation",
+    statManualWork: "Manual work",
+    statAiOps: "AI operations",
+    dashboardLive: "Live",
+    dashboardAutomations: "Automations",
+    dashboardConversations: "Conversations",
+    dashboardHoursSaved: "Hours saved",
+    dashboardThisMonth: "this mo.",
+    dashboardRevenueImpact: "Revenue impact",
+    dashboardFeed1: "Support agent resolved ticket #48211",
+    dashboardFeed2: "CRM automation enriched 42 leads",
+    dashboardFeed3: "Voice agent booked 3 discovery calls",
+    dashboardAgo: "m ago",
+    dashboardUptime: "Model uptime",
+    dashboardPipelineLift: "Pipeline lift",
+    trustedBy: "Trusted by modern teams shipping AI in production",
+    contactBadge: "Free 30-min consultation",
+    contactTitleA: "Let's build your",
+    contactTitleB: "AI future",
+    contactDescription:
+      "Tell us about your business. We'll come back with a clear recommendation, an outcome-based scope and a realistic timeline.",
+    name: "Full name",
+    company: "Company",
+    workEmail: "Work email",
+    phone: "Phone",
+    serviceInterested: "Service interested in",
+    selectService: "Select a service",
+    budget: "Budget",
+    monthlyBudget: "Monthly budget",
+    timeline: "Timeline",
+    startWhen: "When do you want to start?",
+    projectPrompt: "Tell us about your project",
+    projectPlaceholder: "What problem are you trying to solve with AI?",
+    sending: "Sending...",
+    submitCta: "Let's build your AI future",
+    legalDisclaimer: "By submitting you agree to our privacy policy. No spam ever.",
+    serviceOther: "Other",
+    timelineAsap: "ASAP",
+    timelineMonth: "In 1 month",
+    timelineQuarter: "In 1 quarter",
+    timelineExplore: "Just exploring",
+    footerDescription:
+      "SofTech AI Agency designs and builds AI systems that quietly run behind the world's most ambitious companies.",
+    subscribedToast: "Subscribed. Welcome aboard.",
+    subscribe: "Subscribe",
+    privacy: "Privacy",
+    terms: "Terms",
+    rights: "All rights reserved.",
+    thanksToast: "Thanks, we'll be in touch within one business day.",
+  },
+  es: {
+    contact: "Contacto",
+    bookCall: "Agendar llamada",
+    openMenu: "Abrir menú",
+    trustBadge: "Aliado de IA para equipos modernos",
+    heroTitleA: "Construye un",
+    heroTitleB: "negocio con IA",
+    heroTitleC: ".",
+    heroTitleD: "Automatiza trabajo.",
+    heroTitleE: "Escala más rápido.",
+    heroDescription:
+      "SofTech AI Agency diseña, construye e implementa sistemas, agentes y automatizaciones de IA que trabajan 24/7 para que tu equipo se enfoque en crecer.",
+    heroPrimaryCta: "Agendar consulta gratis",
+    heroSecondaryCta: "Ver soluciones",
+    statManualWork: "Trabajo manual",
+    statAiOps: "Operaciones de IA",
+    statLeadGen: "Generación de leads",
+    dashboardLive: "En vivo",
+    dashboardAutomations: "Automatizaciones",
+    dashboardConversations: "Conversaciones",
+    dashboardHoursSaved: "Horas ahorradas",
+    dashboardThisMonth: "este mes",
+    dashboardRevenueImpact: "Impacto en ingresos",
+    dashboardFeed1: "Agente de soporte resolvió ticket #48211",
+    dashboardFeed2: "Automatización CRM enriqueció 42 leads",
+    dashboardFeed3: "Agente de voz agendó 3 llamadas discovery",
+    dashboardAgo: "min",
+    dashboardUptime: "Disponibilidad del modelo",
+    dashboardPipelineLift: "Aumento de pipeline",
+    trustedBy: "Con la confianza de equipos modernos que lanzan IA en producción",
+    contactBadge: "Consulta gratis de 30 min",
+    contactTitleA: "Construyamos tu",
+    contactTitleB: "futuro con IA",
+    contactDescription:
+      "Contanos sobre tu negocio. Volvemos con una recomendación clara, alcance por resultados y cronograma realista.",
+    name: "Nombre completo",
+    company: "Empresa",
+    workEmail: "Email laboral",
+    phone: "Teléfono",
+    serviceInterested: "Servicio de interés",
+    selectService: "Selecciona un servicio",
+    budget: "Presupuesto",
+    monthlyBudget: "Presupuesto mensual",
+    timeline: "Plazos",
+    startWhen: "¿Cuándo quieres empezar?",
+    projectPrompt: "Contanos sobre tu proyecto",
+    projectPlaceholder: "¿Qué problema quieres resolver con IA?",
+    sending: "Enviando...",
+    submitCta: "Construyamos tu futuro con IA",
+    legalDisclaimer: "Al enviar aceptas nuestra política de privacidad. Cero spam.",
+    serviceOther: "Otro",
+    timelineAsap: "Lo antes posible",
+    timelineMonth: "En 1 mes",
+    timelineQuarter: "En 1 trimestre",
+    timelineExplore: "Solo explorando",
+    footerDescription:
+      "SofTech AI Agency diseña y construye sistemas de IA que operan en segundo plano para empresas ambiciosas.",
+    subscribedToast: "Suscripción confirmada. Bienvenido.",
+    subscribe: "Suscribirse",
+    privacy: "Privacidad",
+    terms: "Términos",
+    rights: "Todos los derechos reservados.",
+    thanksToast: "Gracias, te contactaremos dentro de un día hábil.",
+  },
+} as const;
+
+type Copy = Record<keyof (typeof COPY)["en"], string>;
+
+const SEO_COPY = {
+  en: {
+    title: "SofTech AI Agency - AI Solutions & Intelligent Automations",
+    description:
+      "SofTech AI Agency builds enterprise-grade AI systems, chatbots, voice agents and automations that grow revenue, cut cost and scale operations 24/7.",
+    ogTitle: "SofTech AI Agency - AI Solutions & Intelligent Automations",
+    ogDescription:
+      "We build AI systems that work while you sleep. Automation, AI agents and custom AI for SMBs, startups and enterprises.",
+    twitterTitle: "SofTech AI Agency",
+    twitterDescription: "AI Solutions. Intelligent Automations. Real Business Growth.",
+  },
+  es: {
+    title: "SofTech AI Agency - Soluciones IA y Automatizaciones Inteligentes",
+    description:
+      "SofTech AI Agency construye sistemas de IA empresariales, chatbots, agentes de voz y automatizaciones para crecer ingresos, reducir costos y escalar operaciones 24/7.",
+    ogTitle: "SofTech AI Agency - Soluciones IA y Automatizaciones Inteligentes",
+    ogDescription:
+      "Construimos sistemas de IA que trabajan mientras duermes. Automatización, agentes IA y desarrollo IA a medida para empresas.",
+    twitterTitle: "SofTech AI Agency",
+    twitterDescription: "Soluciones IA. Automatizaciones inteligentes. Crecimiento real.",
+  },
+} as const;
+
+const I18N_CONTEXT = createContext<{
+  lang: Language;
+  setLang: (next: Language) => void;
+  copy: Copy;
+} | null>(null);
+
+function useI18n() {
+  const ctx = useContext(I18N_CONTEXT);
+  if (!ctx) {
+    throw new Error("useI18n must be used within I18N_CONTEXT provider");
+  }
+  return ctx;
+}
 
 function Logo() {
   return (
@@ -123,6 +312,8 @@ function Logo() {
 }
 
 function Nav() {
+  const { lang, setLang, copy } = useI18n();
+  const navLinks = NAV_LINKS[lang];
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   useEffect(() => {
@@ -146,7 +337,7 @@ function Nav() {
         >
           <Logo />
           <nav className="hidden md:flex items-center gap-8">
-            {NAV_LINKS.map((l) => (
+            {navLinks.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
@@ -157,22 +348,42 @@ function Nav() {
             ))}
           </nav>
           <div className="hidden md:flex items-center gap-3">
+            <div className="rounded-full border border-white/10 p-1 flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setLang("en")}
+                className={`rounded-full px-2.5 py-1 text-xs transition ${
+                  lang === "en" ? "bg-white/15 text-foreground" : "text-muted-foreground"
+                }`}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setLang("es")}
+                className={`rounded-full px-2.5 py-1 text-xs transition ${
+                  lang === "es" ? "bg-white/15 text-foreground" : "text-muted-foreground"
+                }`}
+              >
+                ES
+              </button>
+            </div>
             <a
               href="#contact"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              Contact
+              {copy.contact}
             </a>
             <a
               href="#contact"
               className="btn-primary inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium"
             >
-              Book a call <ArrowRight className="h-4 w-4" />
+              {copy.bookCall} <ArrowRight className="h-4 w-4" />
             </a>
           </div>
           <button
             className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-xl glass"
-            aria-label="Open menu"
+            aria-label={copy.openMenu}
             onClick={() => setOpen((v) => !v)}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -181,7 +392,7 @@ function Nav() {
         {open && (
           <div className="md:hidden mt-2 rounded-2xl glass-strong p-4 animate-rise">
             <div className="flex flex-col gap-1">
-              {NAV_LINKS.map((l) => (
+              {navLinks.map((l) => (
                 <a
                   key={l.href}
                   href={l.href}
@@ -196,8 +407,28 @@ function Nav() {
                 onClick={() => setOpen(false)}
                 className="btn-primary mt-2 inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-medium"
               >
-                Book a call <ArrowRight className="h-4 w-4" />
+                {copy.bookCall} <ArrowRight className="h-4 w-4" />
               </a>
+              <div className="mt-2 flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setLang("en")}
+                  className={`rounded-full px-3 py-1 text-xs transition ${
+                    lang === "en" ? "bg-white/15 text-foreground" : "text-muted-foreground"
+                  }`}
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLang("es")}
+                  className={`rounded-full px-3 py-1 text-xs transition ${
+                    lang === "es" ? "bg-white/15 text-foreground" : "text-muted-foreground"
+                  }`}
+                >
+                  ES
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -233,6 +464,7 @@ function StatChip({
 }
 
 function HeroDashboard() {
+  const { copy } = useI18n();
   return (
     <div className="relative">
       <div className="absolute -inset-8 bg-gradient-to-tr from-[#14b8a6]/25 via-[#38bdf8]/15 to-[#8b5cf6]/25 blur-3xl rounded-[3rem]" />
@@ -252,15 +484,15 @@ function HeroDashboard() {
                 <span className="absolute inline-flex h-full w-full rounded-full bg-[#10b981] animate-ping opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-[#10b981]" />
               </span>
-              Live
+              {copy.dashboardLive}
             </div>
           </div>
 
           <div className="mt-6 grid grid-cols-3 gap-3">
             {[
-              { l: "Automations", v: "128", d: "+12" },
-              { l: "Conversations", v: "24.7k", d: "+38%" },
-              { l: "Hours saved", v: "3,412", d: "this mo." },
+              { l: copy.dashboardAutomations, v: "128", d: "+12" },
+              { l: copy.dashboardConversations, v: "24.7k", d: "+38%" },
+              { l: copy.dashboardHoursSaved, v: "3,412", d: copy.dashboardThisMonth },
             ].map((s) => (
               <div key={s.l} className="rounded-xl bg-white/[0.03] border border-white/5 p-3">
                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
@@ -274,7 +506,7 @@ function HeroDashboard() {
 
           <div className="mt-5 rounded-xl bg-white/[0.03] border border-white/5 p-4">
             <div className="flex items-center justify-between">
-              <div className="text-xs text-muted-foreground">Revenue impact</div>
+              <div className="text-xs text-muted-foreground">{copy.dashboardRevenueImpact}</div>
               <div className="text-[11px] text-[#67e8f9] font-mono">+$182,430</div>
             </div>
             <svg viewBox="0 0 300 80" className="mt-3 w-full h-16">
@@ -303,9 +535,9 @@ function HeroDashboard() {
 
           <div className="mt-4 space-y-2.5">
             {[
-              { icon: <Bot className="h-3.5 w-3.5" />, t: "Support agent resolved ticket #48211", c: "#14b8a6" },
-              { icon: <Workflow className="h-3.5 w-3.5" />, t: "CRM automation enriched 42 leads", c: "#38bdf8" },
-              { icon: <Mic className="h-3.5 w-3.5" />, t: "Voice agent booked 3 discovery calls", c: "#8b5cf6" },
+              { icon: <Bot className="h-3.5 w-3.5" />, t: copy.dashboardFeed1, c: "#14b8a6" },
+              { icon: <Workflow className="h-3.5 w-3.5" />, t: copy.dashboardFeed2, c: "#38bdf8" },
+              { icon: <Mic className="h-3.5 w-3.5" />, t: copy.dashboardFeed3, c: "#8b5cf6" },
             ].map((r, i) => (
               <div
                 key={i}
@@ -319,7 +551,7 @@ function HeroDashboard() {
                 </span>
                 <div className="text-xs">{r.t}</div>
                 <span className="ml-auto text-[10px] text-muted-foreground font-mono">
-                  {i + 1}m ago
+                  {i + 1} {copy.dashboardAgo}
                 </span>
               </div>
             ))}
@@ -334,7 +566,7 @@ function HeroDashboard() {
             <BrainCircuit className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-[10px] text-muted-foreground">Model uptime</div>
+            <div className="text-[10px] text-muted-foreground">{copy.dashboardUptime}</div>
             <div className="text-sm font-semibold">99.98%</div>
           </div>
         </div>
@@ -345,7 +577,7 @@ function HeroDashboard() {
             <TrendingUp className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-[10px] text-muted-foreground">Pipeline lift</div>
+            <div className="text-[10px] text-muted-foreground">{copy.dashboardPipelineLift}</div>
             <div className="text-sm font-semibold">+247%</div>
           </div>
         </div>
@@ -355,6 +587,7 @@ function HeroDashboard() {
 }
 
 function Hero() {
+  const { copy } = useI18n();
   return (
     <section id="top" className="relative pt-32 sm:pt-40 pb-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -365,41 +598,40 @@ function Hero() {
                 <span className="absolute inline-flex h-full w-full rounded-full bg-[#14b8a6] animate-ping opacity-75" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#14b8a6]" />
               </span>
-              Trusted AI partner for modern teams
+                {copy.trustBadge}
             </div>
             <h1 className="mt-6 font-display text-5xl sm:text-6xl lg:text-7xl font-semibold leading-[1.02] tracking-tight">
-              Build an <span className="text-gradient">AI-powered</span> business.
+                {copy.heroTitleA} <span className="text-gradient">{copy.heroTitleB}</span>
+                {copy.heroTitleC}
               <br />
-              Automate work.
+                {copy.heroTitleD}
               <br />
-              Scale faster.
+                {copy.heroTitleE}
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted-foreground leading-relaxed">
-              SofTech AI Agency designs, builds and deploys custom AI systems, agents
-              and automations that work 24/7 — so your team can focus on growth, not
-              busywork.
+                {copy.heroDescription}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a
                 href="#contact"
                 className="btn-primary inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold"
               >
-                Book a free consultation
+                  {copy.heroPrimaryCta}
                 <ArrowRight className="h-4 w-4" />
               </a>
               <a
                 href="#services"
                 className="glass hover:bg-white/[0.06] inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-medium transition"
               >
-                See our solutions
+                  {copy.heroSecondaryCta}
                 <ChevronRight className="h-4 w-4" />
               </a>
             </div>
 
             <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-lg">
-              <StatChip value="+250%" label="Lead generation" icon={<TrendingUp className="h-5 w-5" />} />
-              <StatChip value="-80%" label="Manual work" icon={<Zap className="h-5 w-5" />} />
-              <StatChip value="24/7" label="AI operations" icon={<Clock className="h-5 w-5" />} />
+                <StatChip value="+250%" label={copy.statLeadGen} icon={<TrendingUp className="h-5 w-5" />} />
+                <StatChip value="-80%" label={copy.statManualWork} icon={<Zap className="h-5 w-5" />} />
+                <StatChip value="24/7" label={copy.statAiOps} icon={<Clock className="h-5 w-5" />} />
             </div>
           </div>
 
@@ -420,11 +652,12 @@ const LOGOS = [
 ];
 
 function TrustedBy() {
+  const { copy } = useI18n();
   return (
     <section className="py-16 border-y border-white/5">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <p className="text-center text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Trusted by modern teams shipping AI in production
+          {copy.trustedBy}
         </p>
         <div className="mt-8 overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
           <div className="flex gap-14 whitespace-nowrap animate-marquee">
@@ -480,6 +713,7 @@ function SectionHeader({
 /* -------------------------------- ABOUT -------------------------------- */
 
 function About() {
+  const { lang } = useI18n();
   const cards = [
     {
       icon: <Rocket className="h-5 w-5" />,
@@ -503,21 +737,51 @@ function About() {
     },
   ];
 
+  const cardsEs = [
+    {
+      icon: <Rocket className="h-5 w-5" />,
+      title: "Misión",
+      body: "Dar a cada negocio acceso a sistemas de IA que antes estaban reservados para las empresas más avanzadas.",
+    },
+    {
+      icon: <BrainCircuit className="h-5 w-5" />,
+      title: "Visión",
+      body: "Un mundo donde las personas diseñan, deciden y crean mientras la IA hace el trabajo repetitivo de cada flujo.",
+    },
+    {
+      icon: <ShieldCheck className="h-5 w-5" />,
+      title: "Valores",
+      body: "Calidad, transparencia, ROI medible y seguridad de nivel empresarial en todo lo que construimos.",
+    },
+    {
+      icon: <Users className="h-5 w-5" />,
+      title: "Por qué confían en nosotros",
+      body: "Ingenieros senior de IA, diseñadores de producto y expertos en automatización responsables de punta a punta.",
+    },
+  ];
+
+  const localizedCards = lang === "es" ? cardsEs : cards;
+
   return (
     <section id="about" className="py-28 sm:py-36">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
-          eyebrow="About SofTech AI"
+          eyebrow={lang === "es" ? "Sobre SofTech AI" : "About SofTech AI"}
           title={
             <>
-              An AI studio built for <span className="text-gradient">operators</span>,
-              not experiments
+              {lang === "es" ? "Un estudio de IA creado para " : "An AI studio built for "}
+              <span className="text-gradient">{lang === "es" ? "operadores" : "operators"}</span>
+              {lang === "es" ? ", no para experimentos" : ", not experiments"}
             </>
           }
-          description="We are a compact team of AI engineers, automation architects and product designers helping ambitious companies deploy real, revenue-generating AI systems."
+          description={
+            lang === "es"
+              ? "Somos un equipo compacto de ingenieros de IA, arquitectos de automatización y diseñadores de producto que ayuda a empresas ambiciosas a desplegar sistemas de IA reales que generan ingresos."
+              : "We are a compact team of AI engineers, automation architects and product designers helping ambitious companies deploy real, revenue-generating AI systems."
+          }
         />
         <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {cards.map((c) => (
+          {localizedCards.map((c) => (
             <div
               key={c.title}
               className="gradient-border rounded-2xl p-6 hover-lift"
@@ -552,21 +816,44 @@ const SERVICES = [
   { icon: LayoutDashboard, title: "Custom Dashboards", body: "Beautiful internal tools and dashboards that make AI outputs actionable." },
 ];
 
+const SERVICES_ES = [
+  { icon: Bot, title: "Chatbots de IA", body: "Agentes conversacionales para soporte, ventas y operaciones internas entrenados con tus datos." },
+  { icon: PhoneCall, title: "Agentes de Voz IA", body: "Llamadas con voz natural que califican leads, agendan reuniones y atienden llamadas entrantes 24/7." },
+  { icon: Workflow, title: "Automatización de Flujos", body: "Conecta apps, elimina pasos manuales y orquesta procesos de negocio de punta a punta." },
+  { icon: Database, title: "Automatización de CRM", body: "Enriquecimiento, scoring, ruteo y seguimientos ejecutándose dentro de tu CRM." },
+  { icon: Target, title: "Generación de Leads", body: "Sistemas de IA que buscan, investigan y calientan prospectos calificados en piloto automático." },
+  { icon: Lightbulb, title: "Consultoría de IA", body: "Estrategia, roadmap y prioridades donde la IA realmente impacta en tus resultados." },
+  { icon: Code2, title: "Desarrollo IA a Medida", body: "Productos de IA, agentes y copilotos hechos a medida de tus flujos de trabajo." },
+  { icon: Users, title: "Asistentes IA Internos", body: "Asistentes privados que responden, resumen y ejecutan acciones sobre conocimiento interno." },
+  { icon: BarChart3, title: "Inteligencia de Negocio", body: "Dashboards con IA que muestran insights, anomalías y la siguiente mejor acción." },
+  { icon: Plug, title: "Integraciones de IA", body: "Integraciones nativas con tu stack: Slack, HubSpot, Notion, Salesforce y más." },
+  { icon: Zap, title: "Automatización por API", body: "Pipelines robustos orientados a eventos con reintentos, observabilidad y auditoría completa." },
+  { icon: LayoutDashboard, title: "Dashboards a Medida", body: "Herramientas internas y tableros que convierten resultados de IA en decisiones accionables." },
+];
+
 function Services() {
+  const { lang } = useI18n();
+  const services = lang === "es" ? SERVICES_ES : SERVICES;
   return (
     <section id="services" className="py-28 sm:py-36">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
-          eyebrow="Services"
+          eyebrow={lang === "es" ? "Servicios" : "Services"}
           title={
             <>
-              Everything you need to run an <span className="text-gradient">AI-native</span> company
+              {lang === "es" ? "Todo lo que necesitas para operar una empresa " : "Everything you need to run an "}
+              <span className="text-gradient">{lang === "es" ? "nativa en IA" : "AI-native"}</span>
+              {lang === "es" ? "" : " company"}
             </>
           }
-          description="From strategy to shipped systems — we design, build and operate the AI stack that quietly runs behind your business."
+          description={
+            lang === "es"
+              ? "Desde estrategia hasta sistemas en producción: diseñamos, construimos y operamos la capa de IA que trabaja detrás de tu negocio."
+              : "From strategy to shipped systems — we design, build and operate the AI stack that quietly runs behind your business."
+          }
         />
         <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {SERVICES.map(({ icon: Icon, title, body }) => (
+          {services.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
               className="group relative overflow-hidden rounded-2xl glass p-6 hover-lift"
@@ -578,7 +865,7 @@ function Services() {
               <h3 className="relative mt-5 font-display text-lg font-semibold">{title}</h3>
               <p className="relative mt-2 text-sm text-muted-foreground leading-relaxed">{body}</p>
               <div className="relative mt-5 inline-flex items-center gap-1.5 text-xs text-[#67e8f9] opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition">
-                Learn more <ArrowRight className="h-3.5 w-3.5" />
+                {lang === "es" ? "Saber más" : "Learn more"} <ArrowRight className="h-3.5 w-3.5" />
               </div>
             </div>
           ))}
@@ -598,23 +885,38 @@ const STEPS = [
   { n: "05", title: "Optimization", body: "Continuous improvement — new data, new models, new automations. Compounding ROI over time." },
 ];
 
+const STEPS_ES = [
+  { n: "01", title: "Descubrimiento", body: "Auditamos tu negocio, flujos y datos. Juntos identificamos oportunidades de IA con mayor ROI." },
+  { n: "02", title: "Estrategia", body: "Un roadmap claro: qué construir, qué automatizar, qué modelos usar y cómo medir el éxito." },
+  { n: "03", title: "Desarrollo", body: "Nuestros ingenieros construyen sistemas de IA listos para producción con arquitectura segura." },
+  { n: "04", title: "Despliegue", body: "Lanzamos, integramos con tus herramientas y entrenamos a tu equipo para operar los sistemas." },
+  { n: "05", title: "Optimización", body: "Mejora continua con nuevos datos, modelos y automatizaciones para multiplicar ROI." },
+];
+
 function Process() {
+  const { lang } = useI18n();
+  const steps = lang === "es" ? STEPS_ES : STEPS;
   return (
     <section id="process" className="py-28 sm:py-36 relative">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
-          eyebrow="How we work"
+          eyebrow={lang === "es" ? "Cómo trabajamos" : "How we work"}
           title={
             <>
-              A proven path from idea to <span className="text-gradient">deployed AI</span>
+              {lang === "es" ? "Un camino probado de la idea a la " : "A proven path from idea to "}
+              <span className="text-gradient">{lang === "es" ? "IA desplegada" : "deployed AI"}</span>
             </>
           }
-          description="Five stages, one accountable team. No hand-offs, no black boxes, no wasted quarters."
+          description={
+            lang === "es"
+              ? "Cinco etapas, un equipo responsable. Sin traspasos, sin caja negra y sin trimestres perdidos."
+              : "Five stages, one accountable team. No hand-offs, no black boxes, no wasted quarters."
+          }
         />
         <div className="mt-16 relative">
           <div className="hidden lg:block absolute left-0 right-0 top-8 h-px bg-gradient-to-r from-transparent via-[#14b8a6]/60 to-transparent" />
           <div className="grid lg:grid-cols-5 gap-6">
-            {STEPS.map((s, i) => (
+            {steps.map((s, i) => (
               <div key={s.n} className="relative">
                 <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl gradient-border glass-strong mx-auto">
                   <span className="font-display text-lg text-gradient-primary font-semibold">
@@ -654,21 +956,41 @@ const SOLUTIONS = [
   { icon: CircuitBoard, name: "Analytics AI", tag: "Data" },
 ];
 
+const SOLUTIONS_ES = [
+  { icon: MessageSquare, name: "IA para Soporte", tag: "Soporte" },
+  { icon: TrendingUp, name: "IA para Ventas", tag: "Ingresos" },
+  { icon: Megaphone, name: "IA para Marketing", tag: "Crecimiento" },
+  { icon: Users, name: "IA Interna", tag: "Ops" },
+  { icon: BarChart3, name: "IA para Finanzas", tag: "Finanzas" },
+  { icon: Building2, name: "IA para RRHH", tag: "Personas" },
+  { icon: Workflow, name: "IA para Operaciones", tag: "Ops" },
+  { icon: FileText, name: "IA para Documentos", tag: "Docs" },
+  { icon: Mic, name: "IA de Voz", tag: "Voz" },
+  { icon: CircuitBoard, name: "IA Analítica", tag: "Datos" },
+];
+
 function Solutions() {
+  const { lang } = useI18n();
+  const solutions = lang === "es" ? SOLUTIONS_ES : SOLUTIONS;
   return (
     <section id="solutions" className="py-28 sm:py-36">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
-          eyebrow="AI solutions"
+          eyebrow={lang === "es" ? "Soluciones de IA" : "AI solutions"}
           title={
             <>
-              Purpose-built AI for every part of your <span className="text-gradient">business</span>
+              {lang === "es" ? "IA diseñada para cada área de tu " : "Purpose-built AI for every part of your "}
+              <span className="text-gradient">{lang === "es" ? "negocio" : "business"}</span>
             </>
           }
-          description="Ten focused domains. One coherent AI operating layer across your company."
+          description={
+            lang === "es"
+              ? "Diez dominios enfocados. Una capa operativa de IA coherente para toda tu empresa."
+              : "Ten focused domains. One coherent AI operating layer across your company."
+          }
         />
         <div className="mt-14 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {SOLUTIONS.map(({ icon: Icon, name, tag }) => (
+          {solutions.map(({ icon: Icon, name, tag }) => (
             <div
               key={name}
               className="group rounded-2xl glass p-5 hover-lift text-center"
@@ -704,21 +1026,43 @@ const INDUSTRIES = [
   { icon: UtensilsCrossed, name: "Hospitality" },
 ];
 
+const INDUSTRIES_ES = [
+  { icon: Stethoscope, name: "Salud" },
+  { icon: HomeIcon, name: "Real Estate" },
+  { icon: Scale, name: "Legal" },
+  { icon: BarChart3, name: "Finanzas" },
+  { icon: ShoppingBag, name: "Ecommerce" },
+  { icon: GraduationCap, name: "Educación" },
+  { icon: HardHat, name: "Construcción" },
+  { icon: Factory, name: "Manufactura" },
+  { icon: Cloud, name: "SaaS" },
+  { icon: Megaphone, name: "Marketing" },
+  { icon: UtensilsCrossed, name: "Hospitalidad" },
+];
+
 function Industries() {
+  const { lang } = useI18n();
+  const industries = lang === "es" ? INDUSTRIES_ES : INDUSTRIES;
   return (
     <section id="industries" className="py-28 sm:py-36">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
-          eyebrow="Industries"
+          eyebrow={lang === "es" ? "Industrias" : "Industries"}
           title={
             <>
-              Industry-aware AI for <span className="text-gradient">regulated & complex</span> businesses
+              {lang === "es" ? "IA adaptada a industrias " : "Industry-aware AI for "}
+              <span className="text-gradient">{lang === "es" ? "reguladas y complejas" : "regulated & complex"}</span>
+              {lang === "es" ? "" : " businesses"}
             </>
           }
-          description="We speak the language of your industry — its data, its compliance and its unit economics."
+          description={
+            lang === "es"
+              ? "Hablamos el lenguaje de tu industria: sus datos, su cumplimiento y su economía unitaria."
+              : "We speak the language of your industry — its data, its compliance and its unit economics."
+          }
         />
         <div className="mt-14 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {INDUSTRIES.map(({ icon: Icon, name }) => (
+          {industries.map(({ icon: Icon, name }) => (
             <div
               key={name}
               className="group flex items-center gap-4 rounded-2xl glass p-5 hover-lift"
@@ -773,17 +1117,64 @@ const CASES = [
   },
 ];
 
+const CASES_ES = [
+  {
+    tag: "SaaS · Serie B",
+    title: "Un SDR con IA reemplaza 3 reps outbound",
+    challenge: "El outbound manual consumía 60% del tiempo del equipo SDR con tasas de respuesta a la baja.",
+    solution: "SDR de IA personalizado con investigación, personalización y outreach multicanal.",
+    results: [
+      { k: "+250%", v: "Leads calificados" },
+      { k: "-80%", v: "Trabajo manual" },
+      { k: "6 sem", v: "A producción" },
+    ],
+  },
+  {
+    tag: "Ecommerce · DTC",
+    title: "Agente 24/7 atiende el 78% de tickets",
+    challenge: "El volumen de tickets crecía más rápido que el equipo, afectando CSAT y margen.",
+    solution: "Agente de voz + chat entrenado con catálogo, políticas y tickets históricos.",
+    results: [
+      { k: "78%", v: "Auto-resuelto" },
+      { k: "+60%", v: "Mejora CSAT" },
+      { k: "24/7", v: "Cobertura" },
+    ],
+  },
+  {
+    tag: "Servicios B2B",
+    title: "Automatización ahorra 3,400 horas / mes",
+    challenge: "Flujos repetitivos de back-office en 6 herramientas frenaban el crecimiento.",
+    solution: "Automatizaciones orientadas a eventos, clasificación por IA y copilotos internos.",
+    results: [
+      { k: "3.4k hrs", v: "Ahorro / mes" },
+      { k: "12x", v: "Ops más rápidas" },
+      { k: "0", v: "Errores en 90d" },
+    ],
+  },
+];
+
 function CaseStudies() {
+  const { lang } = useI18n();
+  const cases = lang === "es" ? CASES_ES : CASES;
   return (
     <section id="cases" className="py-28 sm:py-36">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
-          eyebrow="Case studies"
-          title={<>Outcomes over <span className="text-gradient">outputs</span></>}
-          description="A snapshot of what our AI systems deliver when they hit production."
+          eyebrow={lang === "es" ? "Casos de éxito" : "Case studies"}
+          title={
+            <>
+              {lang === "es" ? "Resultados por encima de " : "Outcomes over "}
+              <span className="text-gradient">{lang === "es" ? "entregables" : "outputs"}</span>
+            </>
+          }
+          description={
+            lang === "es"
+              ? "Una muestra de lo que entregan nuestros sistemas de IA cuando llegan a producción."
+              : "A snapshot of what our AI systems deliver when they hit production."
+          }
         />
         <div className="mt-14 grid lg:grid-cols-3 gap-6">
-          {CASES.map((c) => (
+          {cases.map((c) => (
             <article
               key={c.title}
               className="group gradient-border rounded-3xl p-7 hover-lift flex flex-col"
@@ -793,8 +1184,8 @@ function CaseStudies() {
                 {c.title}
               </h3>
               <div className="mt-5 space-y-3 text-sm">
-                <p><span className="text-muted-foreground">Challenge — </span>{c.challenge}</p>
-                <p><span className="text-muted-foreground">Solution — </span>{c.solution}</p>
+                <p><span className="text-muted-foreground">{lang === "es" ? "Desafío" : "Challenge"} - </span>{c.challenge}</p>
+                <p><span className="text-muted-foreground">{lang === "es" ? "Solución" : "Solution"} - </span>{c.solution}</p>
               </div>
               <div className="mt-6 grid grid-cols-3 gap-3 pt-6 border-t border-white/5">
                 {c.results.map((r) => (
@@ -826,27 +1217,45 @@ const COMPARE = [
   { row: "Enterprise quality", trad: "Best effort", us: "SOC-ready standards" },
 ];
 
+const COMPARE_ES = [
+  { row: "Tiempo al primer resultado", trad: "3-6 meses", us: "2-6 semanas" },
+  { row: "Mentalidad AI-first", trad: "Funciones anexas", us: "Sistemas IA nativos" },
+  { row: "Calidad del talento", trad: "Generalistas junior", us: "Ingenieros senior IA" },
+  { row: "Responsabilidad por resultados", trad: "Entregables", us: "Resultados y ROI" },
+  { row: "Soluciones a medida", trad: "Plantillas y plugins", us: "Hecho para tus operaciones" },
+  { row: "Partnership", trad: "Proyecto y fin", us: "Operadores de largo plazo" },
+  { row: "Calidad enterprise", trad: "Mejor esfuerzo", us: "Estándares SOC-ready" },
+];
+
 function WhyUs() {
+  const { lang } = useI18n();
+  const compare = lang === "es" ? COMPARE_ES : COMPARE;
   return (
     <section id="why" className="py-28 sm:py-36">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
-          eyebrow="Why SofTech AI"
-          title={<>The difference between <span className="text-gradient">shipping</span> and shelfware</>}
+          eyebrow={lang === "es" ? "Por qué SofTech AI" : "Why SofTech AI"}
+          title={
+            <>
+              {lang === "es" ? "La diferencia entre " : "The difference between "}
+              <span className="text-gradient">{lang === "es" ? "lanzar" : "shipping"}</span>
+              {lang === "es" ? " y dejarlo en estantería" : " and shelfware"}
+            </>
+          }
         />
         <div className="mt-14 gradient-border rounded-3xl overflow-hidden">
           <div className="grid grid-cols-3 bg-white/[0.02]">
             <div className="p-6 text-xs uppercase tracking-widest text-muted-foreground">
-              Dimension
+              {lang === "es" ? "Dimensión" : "Dimension"}
             </div>
             <div className="p-6 text-xs uppercase tracking-widest text-muted-foreground border-l border-white/5">
-              Traditional agency
+              {lang === "es" ? "Agencia tradicional" : "Traditional agency"}
             </div>
             <div className="p-6 text-xs uppercase tracking-widest text-[#67e8f9] border-l border-white/5">
               SofTech AI Agency
             </div>
           </div>
-          {COMPARE.map((r, i) => (
+          {compare.map((r, i) => (
             <div
               key={r.row}
               className={`grid grid-cols-3 text-sm ${i % 2 ? "bg-white/[0.015]" : ""}`}
@@ -891,16 +1300,47 @@ const TESTIMONIALS = [
   },
 ];
 
+const TESTIMONIALS_ES = [
+  {
+    quote: "SofTech lanzó un SDR con IA en seis semanas que superó a un equipo de tres. Cambió por completo nuestras métricas de pipeline.",
+    name: "Elena Marchetti",
+    role: "VP de Ingresos, Northwind",
+    initials: "EM",
+    color: "from-[#14b8a6] to-[#38bdf8]",
+  },
+  {
+    quote: "Su equipo combina ingeniería senior con criterio de producto. Todas las automatizaciones siguen funcionando perfecto un año después.",
+    name: "James Okafor",
+    role: "COO, Helix Health",
+    initials: "JO",
+    color: "from-[#38bdf8] to-[#8b5cf6]",
+  },
+  {
+    quote: "Reemplazamos 14 flujos frágiles en Zapier por una sola capa operativa con IA. Por fin confiamos en nuestras herramientas internas.",
+    name: "Priya Raman",
+    role: "Líder de Operaciones, Meridian",
+    initials: "PR",
+    color: "from-[#8b5cf6] to-[#67e8f9]",
+  },
+];
+
 function Testimonials() {
+  const { lang } = useI18n();
+  const testimonials = lang === "es" ? TESTIMONIALS_ES : TESTIMONIALS;
   return (
     <section className="py-28 sm:py-36">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
-          eyebrow="Testimonials"
-          title={<>Loved by teams shipping <span className="text-gradient">real AI</span></>}
+          eyebrow={lang === "es" ? "Testimonios" : "Testimonials"}
+          title={
+            <>
+              {lang === "es" ? "Equipos que confían en " : "Loved by teams shipping "}
+              <span className="text-gradient">{lang === "es" ? "IA real" : "real AI"}</span>
+            </>
+          }
         />
         <div className="mt-14 grid md:grid-cols-3 gap-6">
-          {TESTIMONIALS.map((t) => (
+          {testimonials.map((t) => (
             <figure key={t.name} className="glass rounded-3xl p-7 hover-lift">
               <div className="flex items-center gap-1 text-[#f59e0b]">
                 {[...Array(5)].map((_, i) => (
@@ -976,17 +1416,73 @@ const PLANS = [
   },
 ];
 
+const PLANS_ES = [
+  {
+    name: "Starter",
+    price: "$2,500",
+    period: "/ mes",
+    tagline: "Para founders validando casos de uso de IA.",
+    features: [
+      "1 sistema IA (chatbot, automatización o agente)",
+      "Integraciones con hasta 5 herramientas",
+      "Optimización semanal",
+      "Soporte por email y chat",
+    ],
+    cta: "Empezar con Starter",
+    highlight: false,
+  },
+  {
+    name: "Growth",
+    price: "$6,900",
+    period: "/ mes",
+    tagline: "Para equipos que escalan IA entre áreas.",
+    features: [
+      "Hasta 3 sistemas IA en producción",
+      "Agentes IA y agentes de voz personalizados",
+      "Suite de automatización CRM y ops",
+      "Ingeniero dedicado + revisiones semanales",
+    ],
+    cta: "Elegir Growth",
+    highlight: true,
+  },
+  {
+    name: "Enterprise",
+    price: "Personalizado",
+    period: "",
+    tagline: "Para empresas que construyen una capa operativa de IA.",
+    features: [
+      "Sistemas y agentes IA ilimitados",
+      "Modelos privados y SSO / SOC-ready",
+      "SLAs personalizados y soporte on-call",
+      "Asesoría fractional AI CTO",
+    ],
+    cta: "Hablar con ventas",
+    highlight: false,
+  },
+];
+
 function Pricing() {
+  const { lang } = useI18n();
+  const plans = lang === "es" ? PLANS_ES : PLANS;
   return (
     <section id="pricing" className="py-28 sm:py-36">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
-          eyebrow="Pricing"
-          title={<>Simple pricing. <span className="text-gradient">Serious ROI.</span></>}
-          description="Every plan includes a senior team, transparent milestones and measurable outcomes."
+          eyebrow={lang === "es" ? "Precios" : "Pricing"}
+          title={
+            <>
+              {lang === "es" ? "Precios simples. " : "Simple pricing. "}
+              <span className="text-gradient">{lang === "es" ? "ROI serio." : "Serious ROI."}</span>
+            </>
+          }
+          description={
+            lang === "es"
+              ? "Cada plan incluye equipo senior, hitos transparentes y resultados medibles."
+              : "Every plan includes a senior team, transparent milestones and measurable outcomes."
+          }
         />
         <div className="mt-14 grid lg:grid-cols-3 gap-6 items-stretch">
-          {PLANS.map((p) => (
+          {plans.map((p) => (
             <div
               key={p.name}
               className={`relative flex flex-col rounded-3xl p-7 ${
@@ -997,7 +1493,7 @@ function Pricing() {
             >
               {p.highlight && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-[#14b8a6] to-[#8b5cf6] text-white border-0 px-3 py-1 shadow-glow">
-                  Recommended
+                  {lang === "es" ? "Recomendado" : "Recommended"}
                 </Badge>
               )}
               <div>
@@ -1065,17 +1561,51 @@ const FAQS = [
   },
 ];
 
+const FAQS_ES = [
+  {
+    q: "¿Cuánto cuesta realmente un proyecto de IA?",
+    a: "La mayoría de proyectos empieza entre $2.5k y $10k por mes según alcance. En discovery definimos un plan mensual fijo con resultados claros, sin sorpresas.",
+  },
+  {
+    q: "¿Cuánto tarda la implementación?",
+    a: "Primer sistema IA en producción en 2 a 6 semanas. Implementaciones multi-sistema suelen tomar un trimestre. Entregamos en incrementos semanales.",
+  },
+  {
+    q: "¿Qué soporte brindan después del lanzamiento?",
+    a: "Todos los planes incluyen optimización, monitoreo e iteración continua. Growth y Enterprise incluyen ingeniero dedicado y SLA on-call.",
+  },
+  {
+    q: "¿Con qué herramientas y plataformas integran?",
+    a: "HubSpot, Salesforce, Slack, Notion, Zendesk, Intercom, Shopify, Stripe, Google Workspace, Microsoft 365 y cualquier API REST/GraphQL.",
+  },
+  {
+    q: "¿Cómo manejan seguridad y privacidad de datos?",
+    a: "Construimos con prácticas alineadas a SOC 2, modelos privados cuando aplica, secretos cifrados, auditoría y aislamiento estricto por cliente.",
+  },
+  {
+    q: "¿Cómo miden el ROI?",
+    a: "Cada proyecto arranca con una métrica compartida: pipeline, horas ahorradas, costo reducido o mejora de CSAT. Ves avances en reportes semanales.",
+  },
+];
+
 function Faq() {
+  const { lang } = useI18n();
+  const faqs = lang === "es" ? FAQS_ES : FAQS;
   return (
     <section id="faq" className="py-28 sm:py-36">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           eyebrow="FAQ"
-          title={<>Answers before you <span className="text-gradient">even ask</span></>}
+          title={
+            <>
+              {lang === "es" ? "Respuestas antes de que " : "Answers before you "}
+              <span className="text-gradient">{lang === "es" ? "preguntes" : "even ask"}</span>
+            </>
+          }
         />
         <div className="mt-12 gradient-border rounded-3xl p-2 sm:p-4">
           <Accordion type="single" collapsible className="w-full">
-            {FAQS.map((f, i) => (
+            {faqs.map((f, i) => (
               <AccordionItem
                 key={f.q}
                 value={`i${i}`}
@@ -1099,6 +1629,7 @@ function Faq() {
 /* ------------------------------- CONTACT ------------------------------- */
 
 function Contact() {
+  const { copy, lang } = useI18n();
   const [submitting, setSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -1107,7 +1638,7 @@ function Contact() {
     setSubmitting(true);
     setTimeout(() => {
       setSubmitting(false);
-      toast.success("Thanks — we'll be in touch within one business day.");
+      toast.success(copy.thanksToast);
       formRef.current?.reset();
     }, 900);
   }
@@ -1122,21 +1653,27 @@ function Contact() {
               <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-[#8b5cf6]/25 blur-3xl" />
               <div className="relative">
                 <div className="inline-flex items-center gap-2 rounded-full glass px-3 py-1 text-xs text-muted-foreground">
-                  <Sparkles className="h-3 w-3 text-[#67e8f9]" /> Free 30-min consultation
+                  <Sparkles className="h-3 w-3 text-[#67e8f9]" /> {copy.contactBadge}
                 </div>
                 <h2 className="mt-5 font-display text-4xl sm:text-5xl font-semibold tracking-tight leading-tight">
-                  Let's build your <span className="text-gradient">AI future</span>
+                  {copy.contactTitleA} <span className="text-gradient">{copy.contactTitleB}</span>
                 </h2>
                 <p className="mt-4 text-muted-foreground text-lg leading-relaxed max-w-md">
-                  Tell us about your business. We'll come back with a clear
-                  recommendation, an outcome-based scope and a realistic timeline.
+                  {copy.contactDescription}
                 </p>
 
                 <ul className="mt-8 space-y-4 text-sm">
                   {[
-                    { icon: Mail, k: "Email", v: "hello@softech.ai" },
-                    { icon: PhoneCall, k: "Call", v: "+1 (415) 555-0117" },
-                    { icon: MapPin, k: "Studio", v: "Remote-first · San Francisco · Lisbon" },
+                    { icon: Mail, k: lang === "es" ? "Email" : "Email", v: "hello@softech.ai" },
+                    { icon: PhoneCall, k: lang === "es" ? "Llamada" : "Call", v: "+1 (415) 555-0117" },
+                    {
+                      icon: MapPin,
+                      k: lang === "es" ? "Estudio" : "Studio",
+                      v:
+                        lang === "es"
+                          ? "Remoto primero · San Francisco · Lisboa"
+                          : "Remote-first · San Francisco · Lisbon",
+                    },
                   ].map((c) => (
                     <li key={c.k} className="flex items-center gap-3">
                       <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.05] border border-white/5 text-[#67e8f9]">
@@ -1158,33 +1695,40 @@ function Contact() {
               <form ref={formRef} onSubmit={onSubmit} className="space-y-5">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full name</Label>
+                    <Label htmlFor="name">{copy.name}</Label>
                     <Input id="name" required placeholder="Jane Doe" className="bg-white/[0.04] border-white/10" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="company">Company</Label>
+                    <Label htmlFor="company">{copy.company}</Label>
                     <Input id="company" required placeholder="Acme Inc." className="bg-white/[0.04] border-white/10" />
                   </div>
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Work email</Label>
+                    <Label htmlFor="email">{copy.workEmail}</Label>
                     <Input id="email" type="email" required placeholder="jane@acme.com" className="bg-white/[0.04] border-white/10" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
+                    <Label htmlFor="phone">{copy.phone}</Label>
                     <Input id="phone" placeholder="+1 (000) 000-0000" className="bg-white/[0.04] border-white/10" />
                   </div>
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Service interested in</Label>
+                    <Label>{copy.serviceInterested}</Label>
                     <Select>
                       <SelectTrigger className="bg-white/[0.04] border-white/10">
-                        <SelectValue placeholder="Select a service" />
+                        <SelectValue placeholder={copy.selectService} />
                       </SelectTrigger>
                       <SelectContent>
-                        {["AI Chatbots", "AI Voice Agents", "Workflow Automation", "Custom AI Development", "AI Consulting", "Other"].map(
+                        {[
+                          lang === "es" ? "Chatbots de IA" : "AI Chatbots",
+                          lang === "es" ? "Agentes de Voz IA" : "AI Voice Agents",
+                          lang === "es" ? "Automatización de Flujos" : "Workflow Automation",
+                          lang === "es" ? "Desarrollo IA a Medida" : "Custom AI Development",
+                          lang === "es" ? "Consultoria de IA" : "AI Consulting",
+                          copy.serviceOther,
+                        ].map(
                           (s) => (
                             <SelectItem key={s} value={s}>{s}</SelectItem>
                           )
@@ -1193,13 +1737,18 @@ function Contact() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Budget</Label>
+                    <Label>{copy.budget}</Label>
                     <Select>
                       <SelectTrigger className="bg-white/[0.04] border-white/10">
-                        <SelectValue placeholder="Monthly budget" />
+                        <SelectValue placeholder={copy.monthlyBudget} />
                       </SelectTrigger>
                       <SelectContent>
-                        {["< $5k", "$5k – $15k", "$15k – $50k", "$50k+"].map((s) => (
+                        {[
+                          "< $5k",
+                          "$5k - $15k",
+                          "$15k - $50k",
+                          "$50k+",
+                        ].map((s) => (
                           <SelectItem key={s} value={s}>{s}</SelectItem>
                         ))}
                       </SelectContent>
@@ -1207,25 +1756,25 @@ function Contact() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Timeline</Label>
+                  <Label>{copy.timeline}</Label>
                   <Select>
                     <SelectTrigger className="bg-white/[0.04] border-white/10">
-                      <SelectValue placeholder="When do you want to start?" />
+                      <SelectValue placeholder={copy.startWhen} />
                     </SelectTrigger>
                     <SelectContent>
-                      {["ASAP", "In 1 month", "In 1 quarter", "Just exploring"].map((s) => (
+                      {[copy.timelineAsap, copy.timelineMonth, copy.timelineQuarter, copy.timelineExplore].map((s) => (
                         <SelectItem key={s} value={s}>{s}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="message">Tell us about your project</Label>
+                  <Label htmlFor="message">{copy.projectPrompt}</Label>
                   <Textarea
                     id="message"
                     required
                     rows={4}
-                    placeholder="What problem are you trying to solve with AI?"
+                    placeholder={copy.projectPlaceholder}
                     className="bg-white/[0.04] border-white/10"
                   />
                 </div>
@@ -1234,11 +1783,11 @@ function Contact() {
                   disabled={submitting}
                   className="w-full btn-primary rounded-full py-6 text-sm font-semibold"
                 >
-                  {submitting ? "Sending…" : "Let's build your AI future"}
+                  {submitting ? copy.sending : copy.submitCta}
                   <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>
                 <p className="text-[11px] text-center text-muted-foreground">
-                  By submitting you agree to our privacy policy. No spam — ever.
+                  {copy.legalDisclaimer}
                 </p>
               </form>
             </div>
@@ -1252,6 +1801,29 @@ function Contact() {
 /* -------------------------------- FOOTER ------------------------------- */
 
 function Footer() {
+  const { copy, lang } = useI18n();
+  const footerColumns =
+    lang === "es"
+      ? [
+          {
+            title: "Servicios",
+            items: [
+              "Chatbots de IA",
+              "Agentes de Voz IA",
+              "Automatización de Flujos",
+              "IA a Medida",
+            ],
+          },
+          { title: "Empresa", items: ["Nosotros", "Casos de éxito", "Precios", "Contacto"] },
+          { title: "Empresa", items: ["Nosotros", "Casos de éxito", "Precios", "Contacto"] },
+          { title: "Recursos", items: ["Playbooks", "Guía de IA", "Documentación", "Política de Privacidad"] },
+        ]
+      : [
+          { title: "Services", items: ["AI Chatbots", "AI Voice Agents", "Workflow Automation", "Custom AI"] },
+          { title: "Company", items: ["About", "Case studies", "Pricing", "Contact"] },
+          { title: "Resources", items: ["Playbooks", "AI Readiness Guide", "Docs", "Privacy Policy"] },
+        ];
+
   return (
     <footer className="border-t border-white/5 pt-20 pb-10 mt-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -1259,33 +1831,28 @@ function Footer() {
           <div className="lg:col-span-2">
             <Logo />
             <p className="mt-4 text-sm text-muted-foreground max-w-sm leading-relaxed">
-              SofTech AI Agency designs and builds AI systems that quietly run behind
-              the world's most ambitious companies.
+              {copy.footerDescription}
             </p>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                toast.success("Subscribed. Welcome aboard.");
+                toast.success(copy.subscribedToast);
               }}
               className="mt-6 flex items-center gap-2 max-w-sm"
             >
               <Input
                 type="email"
                 required
-                placeholder="you@company.com"
+                placeholder={lang === "es" ? "tu@empresa.com" : "you@company.com"}
                 className="bg-white/[0.04] border-white/10"
               />
               <Button type="submit" className="btn-primary rounded-full px-4">
-                Subscribe
+                {copy.subscribe}
               </Button>
             </form>
           </div>
 
-          {[
-            { title: "Services", items: ["AI Chatbots", "AI Voice Agents", "Workflow Automation", "Custom AI"] },
-            { title: "Company", items: ["About", "Case studies", "Pricing", "Contact"] },
-            { title: "Resources", items: ["Playbooks", "AI Readiness Guide", "Docs", "Privacy Policy"] },
-          ].map((col) => (
+          {footerColumns.map((col) => (
             <div key={col.title}>
               <div className="text-xs uppercase tracking-widest text-muted-foreground">
                 {col.title}
@@ -1304,14 +1871,14 @@ function Footer() {
         </div>
         <div className="mt-14 flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-white/5">
           <div className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} SofTech AI Agency. All rights reserved.
+            © {new Date().getFullYear()} SofTech AI Agency. {copy.rights}
           </div>
           <div className="flex items-center gap-3">
             {[Twitter, Linkedin, Github].map((Icon, i) => (
               <a
                 key={i}
                 href="#"
-                aria-label="Social link"
+                aria-label={lang === "es" ? "Enlace social" : "Social link"}
                 className="flex h-9 w-9 items-center justify-center rounded-lg glass hover:bg-white/[0.08] transition text-muted-foreground hover:text-foreground"
               >
                 <Icon className="h-4 w-4" />
@@ -1319,8 +1886,8 @@ function Footer() {
             ))}
           </div>
           <div className="flex items-center gap-5 text-xs text-muted-foreground">
-            <a href="#" className="hover:text-foreground">Privacy</a>
-            <a href="#" className="hover:text-foreground">Terms</a>
+            <a href="#" className="hover:text-foreground">{copy.privacy}</a>
+            <a href="#" className="hover:text-foreground">{copy.terms}</a>
           </div>
         </div>
       </div>
@@ -1331,26 +1898,69 @@ function Footer() {
 /* -------------------------------- PAGE --------------------------------- */
 
 function LandingPage() {
+  const [lang, setLang] = useState<Language>(() => {
+    if (typeof window === "undefined") {
+      return "en";
+    }
+    const stored = window.localStorage.getItem("site_lang");
+    return stored === "es" ? "es" : "en";
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem("site_lang", lang);
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  useEffect(() => {
+    const seo = SEO_COPY[lang] ?? SEO_COPY.en;
+
+    const upsertMeta = (
+      key: string,
+      value: string,
+      attr: "name" | "property" = "name",
+    ) => {
+      let tag = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute(attr, key);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute("content", value);
+    };
+
+    document.title = seo.title;
+    upsertMeta("description", seo.description, "name");
+    upsertMeta("og:title", seo.ogTitle, "property");
+    upsertMeta("og:description", seo.ogDescription, "property");
+    upsertMeta("twitter:title", seo.twitterTitle, "name");
+    upsertMeta("twitter:description", seo.twitterDescription, "name");
+  }, [lang]);
+
+  const copy = COPY[lang] ?? COPY.en;
+
+
   return (
-    <div className="relative min-h-screen text-foreground">
-      <AuroraBackdrop />
-      <Nav />
-      <main>
-        <Hero />
-        <TrustedBy />
-        <About />
-        <Services />
-        <Process />
-        <Solutions />
-        <Industries />
-        <CaseStudies />
-        <WhyUs />
-        <Testimonials />
-        <Pricing />
-        <Faq />
-        <Contact />
-      </main>
-      <Footer />
-    </div>
+    <I18N_CONTEXT.Provider value={{ lang, setLang, copy }}>
+      <div className="relative min-h-screen text-foreground">
+        <AuroraBackdrop />
+        <Nav />
+        <main>
+          <Hero />
+          <TrustedBy />
+          <About />
+          <Services />
+          <Process />
+          <Solutions />
+          <Industries />
+          <CaseStudies />
+          <WhyUs />
+          <Testimonials />
+          <Pricing />
+          <Faq />
+          <Contact />
+        </main>
+        <Footer />
+      </div>
+    </I18N_CONTEXT.Provider>
   );
 }
