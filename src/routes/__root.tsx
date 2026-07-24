@@ -118,11 +118,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@type": "Organization",
           name: "SofTech AI Agency",
           description:
-            "AI & automation agency building intelligent systems, chatbots, voice agents and custom AI for modern businesses.",
-          slogan: "AI Solutions. Intelligent Automations. Real Business Growth.",
-        }),
-      },
-    ],
+            "AI & automation agency building intelligent systems, chatbots, voice agents and custom AI for modern businesses
   }),
   shellComponent: RootShell,
   component: RootComponent,
