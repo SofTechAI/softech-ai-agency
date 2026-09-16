@@ -1686,7 +1686,7 @@ function Contact() {
 
                 <ul className="mt-8 space-y-4 text-sm">
                   {[
-                    { icon: Mail, k: lang === "es" ? "Email" : "Email", v: "rrondonc@gmail.com" },
+                    { icon: Mail, k: lang === "es" ? "Email" : "Email", v: "admin@softechaiagency.com" },
                     { icon: PhoneCall, k: lang === "es" ? "Llamada" : "Call", v: "+57 (318) 928-2999" },
                     {
                       icon: MapPin,
